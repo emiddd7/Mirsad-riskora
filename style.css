@@ -140,3 +140,19 @@ html[dir="ltr"] .policy-mini{text-align:left}
  .policy-mini span{font-size:9px}
  .policy-mini b{font-size:11px}
 }
+
+
+/* V5 monitoring realism + correct gauge direction */
+.gauge{direction:ltr;overflow:visible}
+.gauge i{left:0;right:auto;background:rgba(12,145,135,.16)}
+.gauge-label{direction:ltr}
+.met.waiting{background:#fff4dc;color:#a47720}
+.met.reached{background:#ddf7ea;color:#25986d}
+.payout-pending{border-color:#eadfbe}
+.indicator-demo{margin:18px auto 0;max-width:680px;background:var(--soft);border:1px solid var(--line);border-radius:18px;padding:12px 14px;text-align:right}
+.indicator-demo>div:first-child{display:flex;justify-content:space-between;align-items:center;gap:12px;color:var(--muted);font-size:11px}
+.indicator-demo strong{color:var(--primary);font-size:14px}
+.indicator-demo input{width:100%;accent-color:var(--primary);margin:10px 0 2px;direction:ltr}
+.range-hints{display:flex;justify-content:space-between;color:var(--muted);font-size:9px}
+.pending-claim>div:first-child{background:#fff4dc;color:#a47720}
+@media(max-width:560px){.indicator-demo{padding:10px 12px}.indicator-demo strong{font-size:12px}.gauge{margin-top:17px}}

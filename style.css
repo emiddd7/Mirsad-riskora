@@ -101,3 +101,42 @@ svg{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-l
  .city{min-height:88px}.package-card{padding:13px}
  .bottom{height:66px}.shell{padding-bottom:66px}.sticky{bottom:66px}
 }
+
+/* ===== V4 final interaction + icon polish ===== */
+.bottom>div{direction:ltr}
+.nav{direction:rtl}
+.nav b svg{display:block}
+.drawer>button:not(.drawer-head button){display:flex;align-items:center;gap:13px}
+.drawer>button:not(.drawer-head button) svg{width:22px;height:22px;flex:0 0 22px;color:var(--primary)}
+.drawer>button:not(.drawer-head button){direction:rtl}
+.logout{display:flex;align-items:center;justify-content:center;gap:9px}
+.logout svg{width:20px;height:20px}
+.policy-icon:before,.auth .brand-mark:before{content:none!important}
+.policy-icon svg{width:24px;height:24px}
+.shield-mini svg{width:27px;height:27px}
+.brand-mark svg{width:34px;height:34px}
+.cloud svg{width:30px;height:30px}
+.bot-icon svg{width:22px;height:22px}
+.contact-btn{display:flex;align-items:center;justify-content:center;gap:9px}
+.contact-btn svg{width:21px;height:21px}
+.head .back svg{width:21px;height:21px}
+html[dir="rtl"] .head .back svg{transform:scaleX(-1)}
+html[dir="ltr"] .head .back svg{transform:none}
+.success-card{max-width:650px;margin:10px auto;padding:24px!important;text-align:center}
+.success-icon{width:74px!important;height:74px!important;border-radius:50%!important;margin:0 auto 15px!important;font-size:34px!important}
+.success-card h1{font-size:25px;margin:8px 0}
+.success-card>p{font-size:12px;color:var(--muted)}
+.policy-mini{display:grid;grid-template-columns:repeat(2,1fr);gap:0 18px;text-align:right;margin:18px 0;border-top:1px solid var(--line)}
+.policy-mini span{padding:10px 0;border-bottom:1px dashed var(--line);font-size:10px;color:var(--muted)}
+.policy-mini b{display:block;color:var(--ink);font-size:12px;margin-top:3px}
+html[dir="ltr"] .policy-mini{text-align:left}
+
+@media(max-width:560px){
+ .drawer>button:not(.drawer-head button){padding:12px 10px;font-size:12px}
+ .drawer>button:not(.drawer-head button) svg{width:20px;height:20px;flex-basis:20px}
+ .success-card{padding:18px!important}
+ .success-card h1{font-size:21px}
+ .policy-mini{gap:0 12px}
+ .policy-mini span{font-size:9px}
+ .policy-mini b{font-size:11px}
+}

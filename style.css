@@ -156,3 +156,10 @@ html[dir="ltr"] .policy-mini{text-align:left}
 .range-hints{display:flex;justify-content:space-between;color:var(--muted);font-size:9px}
 .pending-claim>div:first-child{background:#fff4dc;color:#a47720}
 @media(max-width:560px){.indicator-demo{padding:10px 12px}.indicator-demo strong{font-size:12px}.gauge{margin-top:17px}}
+.auto-source{margin:16px auto 0;max-width:680px;background:#f4faf9;border:1px solid var(--line);border-radius:16px;padding:11px 13px;display:flex;align-items:center;gap:9px;color:var(--muted);font-size:10px;line-height:1.8}.auto-source svg{width:20px;height:20px;flex:0 0 20px;color:var(--primary)}.claim-pending{background:var(--card);border:1px solid var(--line);border-radius:28px;padding:28px;margin-top:18px;box-shadow:var(--shadow)}.pending-icon{width:64px;height:64px;border-radius:20px;background:#fff4df;color:#bd8a2b;display:grid;place-items:center;margin-bottom:18px}.pending-icon svg{width:31px;height:31px}.claim-pending h2{margin:0 0 8px}.claim-pending p{color:var(--muted);line-height:1.9}.claim-pending>div:not(.pending-icon){display:flex;justify-content:space-between;border-top:1px solid var(--line);padding:13px 0;color:var(--muted)}.claim-pending>div:not(.pending-icon) b{color:var(--ink)}
+
+/* Bottom navigation: fixed visual order, matching the original design.
+   Left -> right: Home, My Coverage, Compensation, Support, Account. */
+.bottom > div{direction:ltr !important;}
+.bottom .nav{direction:rtl !important;}
+.bottom .nav span{direction:rtl;}

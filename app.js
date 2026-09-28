@@ -52,7 +52,7 @@ const T={
 const EXTRA={ar:{coverageSub:'جميع وثائقك في مكان واحد',belowTrigger:'لم يتحقق حد التعويض بعد',payoutMet:'تم تجاوز الحد المتفق عليه؛ يظهر التعويض وفق شروط الوثيقة.',payoutWaiting:'يظهر التعويض عند تحقق الحد المتفق عليه.',payoutDue:'التعويض المستحق',claimsSub:'التعويضات الناتجة عن تحقق المؤشر'},en:{coverageSub:'All your policies in one place',belowTrigger:'The trigger has not been reached yet',payoutMet:'The trigger has been reached; payout is shown according to the policy conditions.',payoutWaiting:'Payout appears when the agreed trigger is reached.',payoutDue:'Payout due',claimsSub:'Compensation resulting from the trigger'}};
 const tBase=k=>T[state.lang][k]||EXTRA[state.lang][k]||k;
 const state={
- page:localStorage.getItem('mr_page')||'home',lang:localStorage.getItem('mr_lang')||'ar',dark:localStorage.getItem('mr_dark')==='1',logged:localStorage.getItem('mr_logged')==='1',hazard:localStorage.getItem('mr_hazard')||'rain',city:localStorage.getItem('mr_city')||'riyadh',package:localStorage.getItem('mr_package')||'advanced',policy:localStorage.getItem('mr_policy')==='1',paymentMethod:localStorage.getItem('mr_payment')||'card',history:[],drawer:false,notificationsRead:false,monitorRain:Number(localStorage.getItem('mr_monitorRain')||DATA.currentRain)
+ page:localStorage.getItem('mr_page')||'home',lang:localStorage.getItem('mr_lang')||'ar',dark:localStorage.getItem('mr_dark')==='1',logged:localStorage.getItem('mr_logged')==='1',hazard:localStorage.getItem('mr_hazard')||'rain',city:localStorage.getItem('mr_city')||'riyadh',package:localStorage.getItem('mr_package')||'advanced',policy:localStorage.getItem('mr_policy')==='1',paymentMethod:localStorage.getItem('mr_payment')||'card',history:[],drawer:false,notificationsRead:false,monitorRain:DATA.currentRain
 };
 const t=k=>tBase(k);
 const money=n=>new Intl.NumberFormat(state.lang==='ar'?'ar-SA':'en-US').format(n);
@@ -139,40 +139,37 @@ function coveragePage(){if(!state.policy){shell(`${head(t('coverage'),t('noPolic
 function policyPage(){const p=packages[state.package];shell(`${head(t('policyDetails'),t('active'))}<div class="card"><div class="policy-grid"><div><small>${t('policyNo')}</small><b>MR-2026-8986</b></div><div><small>${t('hazard')}</small><b>${hazardName()}</b></div><div><small>${t('location')}</small><b>${cityName()}</b></div><div><small>${t('package')}</small><b>${pkgName(state.package)}</b></div><div><small>${t('coverageAmount')}</small><b>${money(p.amount)} ${state.lang==='ar'?'ر.س':'SAR'}</b></div><div><small>${t('trigger')}</small><b>${DATA.trigger} mm</b></div><div><small>${t('annual')}</small><b>${money(p.premium)} ${state.lang==='ar'?'ر.س':'SAR'}</b></div><div><small>${t('duration')}</small><b>${t('oneYear')}</b></div></div></div><div class="how-card"><h2>${t('how')}</h2><p>${t('howText')}</p></div><button class="btn primary full" onclick="go('monitoring')">${t('monitor')}</button>`)}
 function monitoringPage(){
  const trigger=DATA.trigger;
- const current=Math.max(0,Math.min(100,Number(state.monitorRain)||0));
+ // The monitored value is supplied automatically by the model/data source.
+ // The user never selects or edits the rainfall value.
+ const current=Number(DATA.currentRain);
  const met=current>=trigger;
- const pct=current;
  const statusClass=met?'met reached':'met waiting';
+ const payout=met?packages[state.package].amount:null;
  shell(`${head(t('monitoring'),t('monitorSub'))}
  <div class="monitor-card">
    <div class="cloud">${icon('rain')}</div>
    <small>${t('current')}</small>
    <div class="monitor-number"><span class="value-number">${current}</span><span>mm</span></div>
-   <div class="gauge" dir="ltr"><i style="width:${pct}%"></i><b style="left:${trigger}%">${trigger}</b></div>
+   <div class="gauge" dir="ltr"><i style="width:${current}%"></i><b style="left:${trigger}%">${trigger}</b></div>
    <div class="gauge-label" dir="ltr"><span>0 mm</span><span>100 mm</span></div>
-   <div class="indicator-demo">
-      <div><label for="monitorRange">${t('demoIndicator')}</label><strong id="monitorRangeValue">${current} mm</strong></div>
-      <input id="monitorRange" type="range" min="0" max="100" step="1" value="${current}" oninput="setMonitorRain(this.value)">
-      <div class="range-hints" dir="ltr"><span>0</span><span>${trigger} ${state.lang==='ar'?'حد التعويض':'trigger'}</span><span>100</span></div>
-   </div>
+   <div class="auto-source">${icon('chart')}<span>${state.lang==='ar'?'القيمة الحالية تُحدَّث تلقائيًا من مؤشر الخطر ولا يحددها المستخدم.':'The current value is updated automatically from the risk indicator and is not user-selected.'}</span></div>
    <div class="${statusClass}">${met?'✓ ':''}${met?t('conditionMet'):t('waiting')}</div>
  </div>
- <div class="monitor-info"><div><small>${t('thresholdLabel')}</small><b>${trigger} mm</b></div><div><small>${t('level')}</small><b>${current>=trigger?'مرتفع':t('medium')}</b></div><div><small>${t('updated')}</small><b>${t('updated')}</b></div><div><small>${t('riskType')}</small><b>${hazardName()}</b></div></div>
- <div class="card payout-live ${met?'payout-ready':'payout-pending'}"><small>${t('payout')}</small><strong>${met?money(packages[state.package].amount):'—'} ${state.lang==='ar'?'ر.س':'SAR'}</strong><p>${met?t('metText'):t('waitingText')}</p></div>`)
-}
-function setMonitorRain(value){
- state.monitorRain=Math.max(0,Math.min(100,Number(value)||0));
- localStorage.setItem('mr_monitorRain',state.monitorRain);
- const met=state.monitorRain>=DATA.trigger;
- const v=document.querySelector('.value-number'); if(v) v.textContent=state.monitorRain;
- const range=document.getElementById('monitorRangeValue'); if(range) range.textContent=state.monitorRain+' mm';
- const fill=document.querySelector('.gauge i'); if(fill) fill.style.width=state.monitorRain+'%';
- const status=document.querySelector('.monitor-card .met'); if(status){status.className='met '+(met?'reached':'waiting');status.textContent=(met?'✓ ':'')+(met?t('conditionMet'):t('waiting'));}
- const payout=document.querySelector('.payout-live'); if(payout){payout.classList.toggle('payout-ready',met);payout.classList.toggle('payout-pending',!met);const strong=payout.querySelector('strong');const text=payout.querySelector('p');if(strong) strong.textContent=met?money(packages[state.package].amount)+' '+(state.lang==='ar'?'ر.س':'SAR'):'—';if(text) text.textContent=met?t('metText'):t('waitingText');}
- const level=document.querySelector('.monitor-info div:nth-child(2) b');if(level) level.textContent=met?(state.lang==='ar'?'مرتفع':'High'):t('medium');
+ <div class="monitor-info"><div><small>${t('thresholdLabel')}</small><b>${trigger} mm</b></div><div><small>${t('level')}</small><b>${current>=trigger?(state.lang==='ar'?'مرتفع':'High'):t('medium')}</b></div><div><small>${t('updated')}</small><b>${t('updated')}</b></div><div><small>${t('riskType')}</small><b>${hazardName()}</b></div></div>
+ <div class="card payout-live ${met?'payout-ready':'payout-pending'}"><small>${t('payout')}</small><strong>${payout!==null?money(payout):'—'} ${payout!==null?(state.lang==='ar'?'ر.س':'SAR'):''}</strong><p>${met?t('metText'):t('waitingText')}</p></div>`)
 }
 
-function claimsPage(){const p=packages[state.package]; const h=head(t('claims'),t('claimsSub')); shell(h+`<div class="claim-success"><div>✓</div><h2>${t('conditionMet')}</h2><p>${t('claimsText')}</p><div><span>${t('trigger')}</span><b>${DATA.trigger} mm</b></div><div><span>${t('current')}</span><b>${DATA.currentRain} mm</b></div><div><span>${t('coverageAmount')}</span><b>${money(p.amount)} ${state.lang==='ar'?'ر.س':'SAR'}</b></div><div><span>${t('payoutDue')}</span><b>${money(p.amount)} ${state.lang==='ar'?'ر.س':'SAR'}</b></div></div>`)}
+function claimsPage(){
+ const p=packages[state.package];
+ const current=Number(DATA.currentRain);
+ const met=current>=DATA.trigger;
+ const h=head(t('claims'),t('claimsSub'));
+ if(!met){
+   shell(h+`<div class="claim-pending"><div class="pending-icon">${icon('clock')}</div><h2>${t('waiting')}</h2><p>${t('waitingText')}</p><div><span>${t('trigger')}</span><b>${DATA.trigger} mm</b></div><div><span>${t('current')}</span><b>${current} mm</b></div><div><span>${t('coverageAmount')}</span><b>${money(p.amount)} ${state.lang==='ar'?'ر.س':'SAR'}</b></div></div>`);
+   return;
+ }
+ shell(h+`<div class="claim-success"><div>${icon('check')}</div><h2>${t('conditionMet')}</h2><p>${t('claimsText')}</p><div><span>${t('trigger')}</span><b>${DATA.trigger} mm</b></div><div><span>${t('current')}</span><b>${current} mm</b></div><div><span>${t('coverageAmount')}</span><b>${money(p.amount)} ${state.lang==='ar'?'ر.س':'SAR'}</b></div><div><span>${t('payoutDue')}</span><b>${money(p.amount)} ${state.lang==='ar'?'ر.س':'SAR'}</b></div></div>`);
+}
 function notificationsPage(){const items=[['✓','تم تفعيل وثيقتك','تم تفعيل وثيقة رسكاورا بنجاح.','منذ 1 ساعة'],['!', 'ارتفع مستوى الخطر في منطقتك','تم تحديث مؤشر الخطر في منطقتك.','منذ ساعتين'],['⌁','اقترب المؤشر من حد التعويض','المؤشر الحالي يقترب من الحد المتفق عليه.','منذ 3 ساعات'],['✓','تم تحقق شرط التعويض','تم تجاوز حد التعويض المحدد في النموذج.','منذ 4 ساعات'],['✓','تم تحديث بيانات الخطر','تم تحديث بيانات الخطر للمراقبة.','منذ 5 ساعات']];shell(`${head(t('notifications'),state.lang==='ar'?'آخر المستجدات المهمة لك':'Your latest important updates')}<div class="notice-list">${items.map(x=>`<div class="notice-item"><div>${x[0]}</div><section><b>${state.lang==='ar'?x[1]:x[1]}</b><small>${x[2]}</small><em>${x[3]}</em></section></div>`).join('')}</div>`)}
 
 function supportPage(){shell(`${head(t('assistant'),t('assistantNow'))}<div class="chat-card"><div class="chat-title"><div class="bot-icon">${icon('support')}</div><b>${t('assistant')} <small>${t('assistantNow')}</small></b></div><div class="messages" id="messages"><div class="bubble bot">${t('ask')}</div><div class="quick-questions"><button onclick="quick('faq1')">${t('faq1')}</button><button onclick="quick('faq3')">${t('faq3')}</button><button onclick="quick('faq4')">${state.lang==='ar'?'كم قيمة القسط؟':'What is the premium?'}</button><button onclick="quick('faq2')">${t('faq2')}</button><button onclick="quick('faq5')">${t('faq5')}</button></div></div><div class="chat-input"><input id="chatInput" class="input" placeholder="${state.lang==='ar'?'اكتب سؤالك هنا':'Type your question here'}"><button onclick="sendChat()" class="send-btn">←</button></div></div><button class="contact-btn" onclick="contactModal()">${icon('support')} ${t('contact')}</button>`)}
